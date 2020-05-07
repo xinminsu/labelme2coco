@@ -1,6 +1,7 @@
 import cv2
 import os
 import argparse
+from itertools import chain
 import json
 
 from labelme import utils
@@ -54,7 +55,6 @@ class labelme2coco(object):
         else:
             img = cv2.imread(os.path.join(os.path.dirname(self.labelme_json[0]),data["imagePath"]))
         height, width = img.shape[:2]
-        print('height={} width = {}'.format(height,width))
         image["height"] = height
         image["width"] = width
         image["id"] = num
@@ -78,7 +78,8 @@ class labelme2coco(object):
         x = contour[:, 0]
         y = contour[:, 1]
         area = 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
-        annotation["segmentation"] = [list(np.asarray(points).flatten())]
+        #annotation["segmentation"] = [list(np.asarray(points).flatten())]
+        annotation["segmentation"] = [list(chain.from_iterable(points))]
         annotation["iscrowd"] = 0
         annotation["area"] = area
         annotation["image_id"] = num
