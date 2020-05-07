@@ -1,3 +1,4 @@
+import cv2
 import os
 import argparse
 import json
@@ -48,9 +49,12 @@ class labelme2coco(object):
 
     def image(self, data, num):
         image = {}
-        img = utils.img_b64_to_arr(data["imageData"])
+        if data["imageData"] is not None:
+            img = utils.img_b64_to_arr(data["imageData"])
+        else:
+            img = cv2.imread(os.path.join(os.path.dirname(self.labelme_json[0]),data["imagePath"]))
         height, width = img.shape[:2]
-        img = None
+        print('height={} width = {}'.format(height,width))
         image["height"] = height
         image["width"] = width
         image["id"] = num
@@ -142,6 +146,7 @@ class labelme2coco(object):
             os.path.dirname(os.path.abspath(self.save_json_path)), exist_ok=True
         )
         json.dump(self.data_coco, open(self.save_json_path, "w"), indent=4)
+        #json.dump(self.data_coco, open(self.save_json_path, "w"), separators=(',', ':'))
 
 
 if __name__ == "__main__":
